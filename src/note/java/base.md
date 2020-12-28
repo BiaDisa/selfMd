@@ -13,6 +13,7 @@
 
 - jvm
 - 算法
+  - leetCode-cookbook
 
 ### 存储
 
@@ -28,7 +29,7 @@
 ### 代码能力插件
 
 - Spring
-  - boot
+  - [boot](\selfMd\src\note\java\java基础\springBoot.md)
   - mvc
 - easyExcel
 
@@ -41,3 +42,9 @@
       - RPC调用
       - MQ
 
+
+
+### 看博客的好地方
+
+- javadoop.com
+- javaGuide
