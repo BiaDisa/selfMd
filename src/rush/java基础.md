@@ -104,7 +104,7 @@ public static void main(String[] args) {
 
 ##### 向上转型(**upcasting**) &&向下转型(**downcasting**)
 
-- 把子类对象直接赋给父类引用叫upcasting向上转型，向上转型不用强制转换。-
+- 把子类对象直接赋给父类引用叫upcasting向上转型，向上转型不用强制转换。
   
 - 例子：上述code中的human = new Fat()
   
@@ -129,13 +129,14 @@ public static void main(String[] args) {
 #### 继承
 
 - 接口和抽象类
-  - 接口：java8中接口已经可以通过*default*修饰方法，来实现方法并提供给子类默认使用，也可以给变量赋值，*但需要显式用等号赋值，不能使用Spring的@Resource和@Autowired注解注入*。
-  - 抽象类：抽象类除了不能直接用等号初始化，其他的和类具有相同的功能。
-  - 我更倾向于*接口*类似于能力属性，*抽象类*类似于模板属性。接口能通过多继承的方式让实现类具有某种能力，而抽象类更像是更重更完备的接口。
+  - 接口：java8中接口已经可以通过*default*修饰方法，来实现方法并提供给子类默认使用，也可以给变量赋值，*但需要显式用等号赋值，不能使用  Spring 的@Resource和@Autowired注解注入*。
+  - 抽象类：抽象类除了不能直接出现在等号右边进行初始化，其他的和类具有相同的功能。
+  - 我更倾向于*接口*类似于能力，*抽象类*类似于模板。接口能通过多继承的方式让实现类具有多种能力，而抽象类更像是更重更完备的预制模板。
     - 如果继承的多接口中，有方法签名完全相同的default方法**而且不重写该方法**，则在编译时就会报错。
+    - 接口只能有public方法，抽象类可以有全类型的方法。
 
 - 继承抽象类后是否能正常调用内部静态类？
-- 
+  - 可以。
 
 ----------------------------
 
@@ -147,8 +148,6 @@ public static void main(String[] args) {
 
 - 静态内部类的**非静态变量**在每个父对象中都有一个独立副本，生命周期内是**隔离的**。
 - 静态内部类的**静态变量**是共享的。
-
-public class StaticInnerClassTest {
 
 ```java
 public void init(){
@@ -181,3 +180,129 @@ public static void main(String[] args) {
 }
 ```
 console输出：10 10 
+
+#### final
+
+see：https://www.cnblogs.com/xd502djj/p/10940627.html
+
+- 简介：
+
+  - > Final用于修饰类、成员变量和成员方法。final修饰的类，不能被继承（String、StringBuilder、StringBuffer、Math，不可变类），其中：
+    >
+    > - 所有的方法都不能被重写(这里需要注意的是不能被重写，但是可以被重载，这里很多人会弄混)，所以不能同时用abstract和final修饰类（abstract修饰的类是抽象类，抽象类是用于被子类继承的，和final起相反的作用）。
+    > - Final修饰的方法不能被重写，但是子类可以用父类中final修饰的方法。
+    > - Final修饰的成员变量是不可变的，如果成员变量是基本数据类型，初始化之后成员变量的值不能被改变，如果成员变量是引用类型，那么它只能指向初始化时指向的那个对象，不能再指向别的对象，但是对象当中的内容是允许改变的。
+
+  - 补充：当用final修饰方法签名的参数时，代表该*局部*参数在方法执行过程中是不可修改的。
+
+- final修饰类：
+
+  - >  被final修饰的类被继承编译器就直接报错了，如果去掉final就没有问题。
+    >
+    > - 那这里就有一个问题了，为什么设计了继承还要有final来破坏这种继承关系呢。
+    >   这个解释在《Java编程思想》说的比较清楚：
+    >   使用 final 方法的原因有两个。第一个原因是把方法锁定，以防任何继承类修改它的含义；第二个原因是效率。在早期的Java实现版本中，会将final方法转为内嵌调用。但是如果方法过于庞大，可能看不到内嵌调用带来的任何性能提升。在最近的 Java 版本中，不需要使用 final 方法进行这些优化了。“
+
+- final修饰变量：
+
+  - code show:
+
+    - *from other's blog(see above)*:
+
+      - ```````````````````java
+         	String a = "xiaomeng2";
+               final String b = "xiaomeng";
+               String d = "xiaomeng";
+               String c = b + 2;
+               String e = d + 2;
+               System.out.println((a == c));
+               System.out.println((a == e));
+        ```````````````````
+
+      - 该块代码输出为 true ： false
+
+    - 代码修改后：
+
+      - ````````````````java
+         String a = "xiaomeng2";
+                final String b = "xiaomeng";
+                String d = "xiaomeng";
+                String c = b + 2;
+                String e = (d + 2).intern();
+                System.out.println((a == c));
+                System.out.println((a == e));
+        ````````````````
+
+      - 输出为：true true
+
+    - 对于上面那部分代码，输出结果不一致的解释：
+
+      >原因：
+      >
+      >1. 变量a指的是字符串常量池中的 xiaomeng2；
+      >2. 变量 b 是 final 修饰的，变量 b 的值在编译时候就已经确定了它的确定值，换句话说就是提前知道了变量 b 的内容到底是个啥，相当于一个编译期常量；
+      >3. 变量 c 是 b + 2得到的，由于 b 是一个常量，所以在使用 b 的时候直接相当于使用 b 的原始值（xiaomeng）来进行计算，所以 c 生成的也是一个常量，a 是常量，c 也是常量，都是 xiaomeng2 而 Java 中常量池中只生成唯一的一个 xiaomeng2 字符串，所以 a 和 c 是相等的！
+      >4. d 是指向常量池中 xiaomeng，但由于 d 不是 final 修饰，也就是说在使用 d 的时候不会提前知道 d 的值是什么，所以在计算 e 的时候就不一样了，e的话由于使用的是 d 的引用计算，变量d的访问却需要在运行时通过链接来进行，所以这种计算会在堆上生成 xiaomeng2 ,所以最终 e 指向的是堆上的 xiaomeng2 ， 所以 a 和 e 不相等。
+      >5. 总得来说就是:a、c是常量池的xiaomeng2，e是堆上的xiaomeng2
+
+      - todo：字符串-jvm
+
+  - 基本变量使用final修饰了就不可变了；使用final修饰了的类不能再指向别处，但是可以修改类中的属性。
+
+  - final方法比非final快一些
+
+  - final关键字提高了性能。JVM和Java应用都会缓存final变量。
+
+  - final变量可以安全的在多线程环境下进行共享，而不需要额外的同步开销。
+
+  - 使用final关键字，JVM会对方法、变量及类进行优化。
+
+#### finally
+
+- 如果finally中有return语句，那么:
+
+  `````````````````JAVA
+      public static String testOnFinally(){
+          try{
+              System.out.println("on try");
+              return "try";
+          }catch (Exception e){
+  
+          }finally {
+              System.out.println("on finally");
+              return "finally";
+          }
+          //从这里开始任何代码的书写都会被编译器检定为错误
+      }
+  `````````````````
+  - finally后方法就不会再继续执行。
+  - finally中的返回值会覆盖所有的返回值。
+  - *上述代码返回：try。*
+
+- 如果finally中没有return语句，那么：
+
+  ```````````````````````java
+      public static String testOnFinally(){
+          try{
+              System.out.println("on try");
+              return "try";
+          }catch (Exception e){
+  
+          }finally {
+              System.out.println("on finally");
+          }
+          return "common";
+      }
+  ```````````````````````
+  - 上述代码输出为：
+
+    ```````
+    on try
+    on finally
+    try
+    ```````
+
+    - 返回值会暂存在**栈**中（todo：哪个栈？-to see : jvm）。
+
+  - 
+

@@ -97,6 +97,7 @@
 - Spring Bean 生命周期
 - SpringMVC 原理
 - SpringBoot 常用注解
+  - @Transactional
 
 ### 设计模式
 
