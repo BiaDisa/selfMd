@@ -101,7 +101,24 @@ private ApplicationContext appContext;
 
 url ： https://juejin.cn/post/6898151607444504584
 
-思路：通过
+思路：通过jdk8的lambda表达式中的：
+
+- Predicate来替换if-else的判断句。
+- Function/Consumer来替换if-else判断为true后执行的语句
+
+后，
+
+- 通过Pair（或其他一对一的映射关系对象），拼装Predicate和Function的方法。
+
+- 通过List容器收集需要的Pair对象
+
+来替换普通的策略模式中，大量需要通过继承来实现的类，降低编码量。
+
+- 优点
+  - 一个工厂类中可以通过简洁的P-F/C的方法，替代需要背后大量类实现的策略模式。
+- 缺点
+  - 如果Function/Consumer逻辑较为复杂，若不将执行逻辑抽出为方法，实际上因为lambda自带的括号等，看着会很杂乱。
+  - 通过这个方式实现的虽然不用大量的类作为策略的具体实现，但也不能使用Spring的管理，需要手动注册策略实现。
 
 
 
@@ -209,4 +226,5 @@ public class StrategyFactory implements InitializingBean, ApplicationContextAwar
 
 1. 工厂方法需要new/注入来创建反直觉，是否可以在修改部分代码，不涉及核心变更（工厂方法写好后，在不需要其他方法的前提下不需要再修改该方法）的情况下，修改成静态工厂的调用方式？
 2. 该方式需要通过参数来进行mapping取出对应的方法，因此在入参和策略类上都带着对应的type，有没有更优雅的实现方式？
+   - answer：type是作为索引使用的，如果不使用索引，可以使用上述提到的Predicate+List进行判别，两者在效率上有差距。
 
